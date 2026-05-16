@@ -14,7 +14,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/meetings")
-public class MeetingRestController {
+public class    MeetingRestController {
 
     @Autowired
     MeetingService meetingService;

@@ -1,4 +1,4 @@
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
@@ -6,13 +6,50 @@ export default function MeetingsPage({username}) {
     const [meetings, setMeetings] = useState([]);
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
-    function handleNewMeeting(meeting) {
+    function handleNewMeeting2(meeting) {
         const nextMeetings = [...meetings, meeting];
         setMeetings(nextMeetings);
         setAddingNewMeeting(false);
     }
 
-    function handleDeleteMeeting(meeting) {
+    async function handleNewMeeting(meeting) {
+        const response = await fetch('/api/meetings', {
+            method: 'POST',
+            body: JSON.stringify(meeting),
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.ok) {
+            console.log(response.body)
+            const nextMeetings = [...meetings, meeting];
+            setMeetings(nextMeetings);
+            setAddingNewMeeting(false);
+        }
+    }
+
+    useEffect(() => {
+        const fetchMeetings = async () => {
+            const response = await fetch(`/api/meetings`);
+            if (response.ok) {
+                const meetings = await response.json();
+                setMeetings(meetings);
+            }
+        };
+        fetchMeetings();
+    }, []);
+
+    async function handleDeleteMeeting(meeting) {
+        console.log(meeting)
+        const response = await fetch(`/api/meetings/${meeting.id}`, {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' }
+        });
+        if (response.ok) {
+            const nextMeetings = meetings.filter(m => m !== meeting);
+            setMeetings(nextMeetings);
+        }
+    }
+
+    function handleDeleteMeeting2(meeting) {
         const nextMeetings = meetings.filter(m => m !== meeting);
         setMeetings(nextMeetings);
     }
