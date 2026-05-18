@@ -10,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Collection;
-import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/meetings")
@@ -96,7 +94,7 @@ public class MeetingRestController {
         return new ResponseEntity<>(currentMeeting, HttpStatus.CREATED);
     }
 
-    @RequestMapping(value = "participants/{id}/{login}", method = RequestMethod.POST)
+    @RequestMapping(value = "participants/{id}/{login}", method = RequestMethod.PUT)
     public ResponseEntity<?> deleteMeetingParticipant(@PathVariable("id") long id,
                                                       @PathVariable("login") String login) {
         Meeting currentMeeting = meetingService.findById(id);
@@ -109,7 +107,7 @@ public class MeetingRestController {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
 
-        currentMeeting.addParticipant(participant);
+        currentMeeting.removeParticipant(participant);
         meetingService.update(currentMeeting);
         return new ResponseEntity<>(currentMeeting, HttpStatus.CREATED);
     }

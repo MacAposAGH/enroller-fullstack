@@ -2,59 +2,79 @@ import {useEffect, useState} from "react";
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
+const Method = {
+    GET:"GET",
+    POST:"POST",
+    PUT:"PUT",
+    DELETE:"DELETE",
+};
+
+const meetingsPath = "meetings";
+const participantsPath = "participants";
+
 export default function MeetingsPage({username}) {
     const [meetings, setMeetings] = useState([]);
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
-
-
-    useEffect(() => {
-        const fetchMeetings = async () => {
-            const response = await fetch(`/api/meetings`);
-            if (response.ok) {
-                const meetings = await response.json();
-                console.log(meetings)
-                setMeetings(meetings);
-            }
-        };
-
+    useEffect( () => {
         fetchMeetings();
     }, []);
 
-    async function handleNewMeeting(meeting) {
-        const response = await fetch('/api/meetings', {
-            method: 'POST',
-            body: JSON.stringify(meeting),
-            headers: {'Content-Type': 'application/json'}
+    async function fetchData(pathVariables = [""], method = Method.GET, body, headers = {}) {
+        let response = await fetch(`/api/${pathVariables.join("/")}`, {
+            method,
+            body: body ? JSON.stringify(body) : undefined,
+            headers: {
+                "Content-Type": "application/json",
+                ...headers
+            }
         });
-        if (response.ok) {
-            const nextMeetings = [...meetings, await response.json()];
+        if (!response.ok) {
+            return null;
+        }
+        try {
+            return await response.json();
+        } catch (error) {
+            return response;
+        }
+    }
+
+    async function fetchMeetings() {
+        const response = await fetchData([meetingsPath]);
+        if (response) {
+            setMeetings(response);
+        }
+    }
+
+    async function handleNewMeeting(meeting) {
+        const response = await fetchData([meetingsPath], Method.POST, meeting);
+        if (response) {
+            const nextMeetings = [...meetings, response];
             setMeetings(nextMeetings);
             setAddingNewMeeting(false);
         }
     }
 
     async function handleDeleteMeeting(meeting) {
-        const response = await fetch(`/api/meetings/${meeting.id}`, {
-            method: 'DELETE',
-            headers: {'Content-Type': 'application/json'}
-        });
-        if (response.ok) {
+        const response = await fetchData([meetingsPath, meeting.id], Method.DELETE);
+        if (response) {
             const nextMeetings = meetings.filter(m => m !== meeting);
             setMeetings(nextMeetings);
         }
     }
 
     async function handleNewParticipant(meeting, participant) {
-        const response = await fetch(`/api/meetings/participants/${meeting.id}`, {
-            method: 'PUT',
-            body: JSON.stringify(participant),
-            headers: {'Content-Type': 'application/json'}
-        });
+       const response = await fetchData([meetingsPath, participantsPath, meeting.id], Method.PUT, participant);
+        if (response) {
+            setMeetings([...meetings]);
+        }
+    }
 
-        if (response.ok) {
-            console.log("ok")
-            setMeetings([...meetings, meeting])
+    async function handleDeleteParticipant(meeting, participant) {
+        const response = fetchData([meetingsPath, participantsPath, meeting.id, participant],
+            Method.PUT, participant);
+        if (response) {
+            setMeetings([...meetings]);
         }
     }
 
@@ -69,7 +89,8 @@ export default function MeetingsPage({username}) {
             {meetings.length > 0 &&
                 <MeetingsList meetings={meetings} username={username}
                               onDelete={handleDeleteMeeting}
-                              onNewParticipant={handleNewParticipant}/>}
+                              onNewParticipant={handleNewParticipant}
+                              onDeleteParticipant={handleDeleteParticipant}/>}
         </div>
-    )
+    );
 }

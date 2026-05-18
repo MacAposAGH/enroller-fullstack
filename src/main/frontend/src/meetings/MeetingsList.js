@@ -1,10 +1,19 @@
-export default function MeetingsList({meetings, username, onDelete, onNewParticipant}) {
+export default function MeetingsList({meetings, username, onDelete, onNewParticipant, onDeleteParticipant}) {
 
     const onSignIn = (meeting) => {
-        const participant = {login:username}
-        meeting.participants.push(participant)
+        const participant = {login: username};
+        meeting.participants.push(participant);
         onNewParticipant(meeting, participant);
-    }
+    };
+
+    const onSignOut = (meeting) => {
+        meeting.participants = meeting.participants.filter(p => p.login !== username);
+        onDeleteParticipant(meeting, username);
+    };
+
+    const isParticipant = (meeting) => {
+        return meeting.participants.find(p => p.login === username);
+    };
 
     return (
         <table>
@@ -28,11 +37,16 @@ export default function MeetingsList({meetings, username, onDelete, onNewPartici
                         </ul>
                     </td>
                     <td>
-                        {meeting.participants.indexOf(username) === -1 &&
+
+
+                        {!isParticipant(meeting) &&
                             <button onClick={() => onSignIn(meeting)}>Sign in</button>}
+                        {isParticipant(meeting) &&
+                            <button onClick={() => onSignOut(meeting)}>Sign out</button>}
                         {meeting.participants.length === 0 &&
                             <button onClick={() => onDelete(meeting)}>Delete</button>}
                     </td>
+
                 </tr>)
             }
             </tbody>
