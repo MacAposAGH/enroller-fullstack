@@ -7,8 +7,7 @@ import UserPanel from "./UserPanel";
 function App() {
     const [loggedIn, setLoggedIn] = useState('');
 
-    function login(email) {
-        console.log(email);
+    function login(email, password) {
         setLoggedIn(email);
     }
 

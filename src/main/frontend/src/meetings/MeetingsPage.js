@@ -17,10 +17,6 @@ export default function MeetingsPage({username}) {
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
     useEffect(() => {
-
-    }, []);
-
-    useEffect(() => {
         (async () => {
             await (() => new Promise(r => setTimeout(r, 200000)))();
             const response = await fetchData([meetingsPath]);
@@ -46,13 +42,6 @@ export default function MeetingsPage({username}) {
             return await response.json();
         } catch (error) {
             return response;
-        }
-    }
-
-    async function fetchMeetings() {
-        const response = await fetchData([meetingsPath]);
-        if (response) {
-            setMeetings(response);
         }
     }
 
