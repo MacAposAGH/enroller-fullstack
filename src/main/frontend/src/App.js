@@ -8,9 +8,8 @@ function App() {
     const [loggedIn, setLoggedIn] = useState('');
 
     function login(email) {
-        if (email) {
-            setLoggedIn(email);
-        }
+        console.log(email);
+        setLoggedIn(email);
     }
 
     function logout() {

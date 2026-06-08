@@ -2,18 +2,10 @@ package com.company.enroller.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToMany;
-import javax.persistence.Table;
+import javax.persistence.*;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 @Entity
@@ -21,7 +13,7 @@ import java.util.Set;
 public class Meeting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column
@@ -33,9 +25,11 @@ public class Meeting {
     @Column
     private String date;
 
+    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    @JoinTable(name = "meeting_participant", joinColumns = {@JoinColumn(name = "meeting_id")}, inverseJoinColumns = {
-            @JoinColumn(name = "participant_login")})
+    @JoinTable(name = "meeting_participant",
+            joinColumns = {@JoinColumn(name = "meeting_id")},
+            inverseJoinColumns = {@JoinColumn(name = "participant_login")})
     Set<Participant> participants = new HashSet<>();
 
     public long getId() {
@@ -80,5 +74,16 @@ public class Meeting {
 
     public Collection<Participant> getParticipants() {
         return participants;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Meeting meeting)) return false;
+        return id == meeting.id && Objects.equals(title, meeting.title) && Objects.equals(description, meeting.description) && Objects.equals(date, meeting.date) && Objects.equals(participants, meeting.participants);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, title, description, date, participants);
     }
 }

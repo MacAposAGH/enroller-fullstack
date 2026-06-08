@@ -3,10 +3,10 @@ import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
 
 const Method = {
-    GET:"GET",
-    POST:"POST",
-    PUT:"PUT",
-    DELETE:"DELETE",
+    GET: "GET",
+    POST: "POST",
+    PUT: "PUT",
+    DELETE: "DELETE",
 };
 
 const meetingsPath = "meetings";
@@ -16,8 +16,18 @@ export default function MeetingsPage({username}) {
     const [meetings, setMeetings] = useState([]);
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
 
-    useEffect( () => {
-        fetchMeetings();
+    useEffect(() => {
+
+    }, []);
+
+    useEffect(() => {
+        (async () => {
+            await (() => new Promise(r => setTimeout(r, 200000)))();
+            const response = await fetchData([meetingsPath]);
+            if (response) {
+                setMeetings(response);
+            }
+        })();
     }, []);
 
     async function fetchData(pathVariables = [""], method = Method.GET, body, headers = {}) {
@@ -64,7 +74,7 @@ export default function MeetingsPage({username}) {
     }
 
     async function handleNewParticipant(meeting, participant) {
-       const response = await fetchData([meetingsPath, participantsPath, meeting.id], Method.PUT, participant);
+        const response = await fetchData([meetingsPath, participantsPath, meeting.id], Method.PUT, participant);
         if (response) {
             setMeetings([...meetings]);
         }
@@ -86,11 +96,15 @@ export default function MeetingsPage({username}) {
                     ? <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)}/>
                     : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
             }
-            {meetings.length > 0 &&
+            {meetings.length > 0 ?
                 <MeetingsList meetings={meetings} username={username}
                               onDelete={handleDeleteMeeting}
                               onNewParticipant={handleNewParticipant}
-                              onDeleteParticipant={handleDeleteParticipant}/>}
+                              onDeleteParticipant={handleDeleteParticipant}/> :
+                <div className="lds-ripple">
+                    <div></div>
+                    <div></div>
+                </div>}
         </div>
     );
 }

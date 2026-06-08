@@ -1,0 +1,36 @@
+package com.company.enroller.persistence;
+
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+
+import java.util.Collection;
+import java.util.function.BiConsumer;
+
+public abstract class AbstractService<T> {
+    DatabaseConnector connector;
+
+    public AbstractService() {
+        connector = DatabaseConnector.getInstance();
+    }
+
+    protected T transaction(T entity, BiConsumer<Session, T> operation) {
+        Session session = connector.getSession();
+        Transaction transaction = session.beginTransaction();
+        operation.accept(session, entity);
+        transaction.commit();
+        return entity;
+    }
+
+    protected Collection<T> getAll(Class<T> type) {
+        String hql = "FROM %s".formatted(type.getSimpleName());
+        return connector.getSession().createQuery(hql, type).list();
+    }
+
+    protected T findById(Class<T> type, String id) {
+        return type.cast(connector.getSession().get(type, id));
+    }
+
+    protected T findById(Class<T> type, Long id) {
+        return type.cast(connector.getSession().get(type,id));
+    }
+}

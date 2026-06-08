@@ -37,8 +37,6 @@ export default function MeetingsList({meetings, username, onDelete, onNewPartici
                         </ul>
                     </td>
                     <td>
-
-
                         {!isParticipant(meeting) &&
                             <button onClick={() => onSignIn(meeting)}>Sign in</button>}
                         {isParticipant(meeting) &&

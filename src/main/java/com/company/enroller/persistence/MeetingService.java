@@ -1,73 +1,49 @@
 package com.company.enroller.persistence;
 
 import com.company.enroller.model.Meeting;
-import com.company.enroller.model.Participant;
-import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 
 @Component("meetingService")
-public class MeetingService {
+public class MeetingService extends AbstractService<Meeting> {
 
-    Session session;
-
-    public MeetingService() {
-        session = DatabaseConnector.getInstance().getSession();
-    }
 
     public Collection<Meeting> getAll() {
-        String hql = "FROM Meeting";
-        Query query = this.session.createQuery(hql);
-        return query.list();
+        return getAll(Meeting.class);
     }
 
-    public Meeting findById(long id) {
-        return this.session.get(Meeting.class, id);
+    public Meeting findById(Long id) {
+        return findById(Meeting.class, id);
     }
 
-    public Collection<Meeting> findMeetings(String title, String description, Participant participant, String sortMode) {
-        String hql = "FROM Meeting as meeting WHERE title LIKE :title AND description LIKE :description ";
-        if (participant != null) {
-            hql += " AND :participant in elements(participants)";
+    public Meeting findById(String id) {
+        return findById(Meeting.class, id);
+    }
+
+    public boolean exists(Meeting meeting) {
+        if (findById(meeting.getId()) == null) {
+            return false;
         }
-        if (sortMode.equals("title")) {
-            hql += " ORDER BY title";
-        }
-        Query query = this.session.createQuery(hql);
-        query.setParameter("title", "%" + title + "%").setParameter("description", "%" + description + "%");
-        if (participant != null) {
-            query.setParameter("participant", participant);
-        }
-        return query.list();
+        String hql = "FROM Meeting m WHERE m.title = ?1 AND m.date = ?2";
+        Query<Meeting> query = connector.getSession().createQuery(hql, Meeting.class);
+        query.setParameter(1, meeting.getTitle());
+        query.setParameter(2, meeting.getDate());
+        return query.uniqueResult() != null;
     }
 
-    public void delete(Meeting meeting) {
-        Transaction transaction = this.session.beginTransaction();
-        this.session.delete(meeting);
-        transaction.commit();
+    public Meeting addMeeting(Meeting meeting) {
+        return transaction(meeting, Session::save);
     }
 
-    public void add(Meeting meeting) {
-        Transaction transaction = this.session.beginTransaction();
-        this.session.save(meeting);
-        transaction.commit();
+    public void updateMeeting(Long id, Meeting meeting) {
+        meeting.setId(id);
+        transaction(meeting, Session::merge);
     }
 
-    public void update(Meeting meeting) {
-        Transaction transaction = this.session.beginTransaction();
-        this.session.merge(meeting);
-        transaction.commit();
+    public void deleteMeeting(Meeting meeting) {
+        transaction(meeting, Session::delete);
     }
-
-    public boolean alreadyExist(Meeting meeting) {
-        String hql = "FROM Meeting WHERE title=:title AND date=:date";
-        Query query = this.session.createQuery(hql);
-        Collection resultList = query.setParameter("title", meeting.getTitle()).setParameter("date", meeting.getDate())
-                .list();
-        return query.list().size() != 0;
-    }
-
 }

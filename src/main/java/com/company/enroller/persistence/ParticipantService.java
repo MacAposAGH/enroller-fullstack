@@ -1,57 +1,64 @@
 package com.company.enroller.persistence;
 
 import com.company.enroller.model.Participant;
-import org.hibernate.Transaction;
-import org.hibernate.query.Query;
+import org.hibernate.Session;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Root;
 import java.util.Collection;
 
 @Component("participantService")
-public class ParticipantService {
+public class ParticipantService extends AbstractService<Participant>{
 
-    DatabaseConnector connector;
+    @Autowired
+    PasswordEncoder passwordEncoder;
 
-    public ParticipantService() {
-        connector = DatabaseConnector.getInstance();
-    }
+    public Collection<Participant> getAll(String sortBy, String sortOrder, String key) {
+        CriteriaBuilder cb = connector.getSession().getCriteriaBuilder();
+        CriteriaQuery<Participant> query = cb.createQuery(Participant.class);
+        Root<Participant> participant = query.from(Participant.class);
 
-    public Collection<Participant> getAll(String login, String sortMode, String sortOrder) {
-        String hql = "FROM Participant WHERE login LIKE :login";
-
-        if (sortMode.equals("login")) {
-            hql += " ORDER BY login";
-            if (sortOrder.equals("ASC") || sortOrder.equals("DESC")) {
-                hql += " " + sortOrder;
-            }
+        if (!key.isBlank()) {
+            query.where(cb.like(participant.get("login"), "%%%s%%".formatted(key)));
         }
 
-        Query query = connector.getSession().createQuery(hql);
-        query.setParameter("login", "%" + login + "%");
-        return query.list();
+        if (sortBy.equalsIgnoreCase("login")) {
+            Order order = sortOrder.equalsIgnoreCase("desc") ?
+                    cb.desc(participant.get(sortBy)) : cb.asc(participant.get(sortBy));
+            query.orderBy(order);
+        }
+
+        return connector.getSession().createQuery(query).getResultList();
+    }
+
+    public Collection<Participant> getAll() {
+        return getAll(Participant.class);
     }
 
     public Participant findByLogin(String login) {
-        return connector.getSession().get(Participant.class, login);
+        return findById(Participant.class, login);
     }
 
-    public Participant add(Participant participant) {
-        Transaction transaction = connector.getSession().beginTransaction();
-        connector.getSession().save(participant);
-        transaction.commit();
-        return participant;
+    public Participant addParticipant(Participant participant) {
+        String hashed = passwordEncoder.encode(participant.getPassword());
+        participant.setPassword(hashed);
+        return transaction(participant, Session::save);
     }
 
-    public void update(Participant participant) {
-        Transaction transaction = connector.getSession().beginTransaction();
-        connector.getSession().merge(participant);
-        transaction.commit();
+    public void updateParticipant(Participant existingParticipant, Participant participant) {
+        transaction(participant, (s, p)->{
+            s.delete(existingParticipant);
+            s.save(p);
+        });
     }
 
-    public void delete(Participant participant) {
-        Transaction transaction = connector.getSession().beginTransaction();
-        connector.getSession().delete(participant);
-        transaction.commit();
+    public void deleteParticipant(Participant participant) {
+         transaction(participant, Session::delete);
     }
 
 }
