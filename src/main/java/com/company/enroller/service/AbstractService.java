@@ -1,5 +1,6 @@
-package com.company.enroller.persistence;
+package com.company.enroller.service;
 
+import com.company.enroller.persistence.DatabaseConnector;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -31,6 +32,6 @@ public abstract class AbstractService<T> {
     }
 
     protected T findById(Class<T> type, Long id) {
-        return type.cast(connector.getSession().get(type,id));
+        return type.cast(connector.getSession().get(type, id));
     }
 }

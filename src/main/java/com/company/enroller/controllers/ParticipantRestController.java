@@ -1,13 +1,14 @@
 package com.company.enroller.controllers;
 
 import com.company.enroller.model.Participant;
-import com.company.enroller.persistence.ErrorHandler;
-import com.company.enroller.persistence.ParticipantService;
+import com.company.enroller.error.ErrorHandler;
+import com.company.enroller.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletResponse;
 import java.util.Collection;
 
 @RestController
@@ -35,6 +36,17 @@ public class ParticipantRestController {
         if (participant == null) {
             return errorHandler.entityDoesntExist();
         }
+        return new ResponseEntity<>(participant, HttpStatus.OK);
+    }
+
+    @RequestMapping(value = "/login", method = RequestMethod.POST)
+    public ResponseEntity<?> login(@RequestBody Participant participant, HttpServletResponse response) {
+        if (participantService.findByLogin(participant.getLogin()) != null) {
+            return errorHandler.entityDoesntExist();
+        }
+
+
+
         return new ResponseEntity<>(participant, HttpStatus.OK);
     }
 

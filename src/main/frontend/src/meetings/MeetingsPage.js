@@ -1,16 +1,7 @@
 import {useEffect, useState} from "react";
 import NewMeetingForm from "./NewMeetingForm";
 import MeetingsList from "./MeetingsList";
-
-const Method = {
-    GET: "GET",
-    POST: "POST",
-    PUT: "PUT",
-    DELETE: "DELETE",
-};
-
-const meetingsPath = "meetings";
-const participantsPath = "participants";
+import {MEETINGS_PATH, METHOD, PARTICIPANTS_PATH, sendRequest} from "../Util";
 
 export default function MeetingsPage({username}) {
     const [meetings, setMeetings] = useState([]);
@@ -19,34 +10,15 @@ export default function MeetingsPage({username}) {
     useEffect(() => {
         (async () => {
             await (() => new Promise(r => setTimeout(r, 200000)))();
-            const response = await fetchData([meetingsPath]);
+            const response = await sendRequest([MEETINGS_PATH]);
             if (response) {
                 setMeetings(response);
             }
         })();
     }, []);
 
-    async function fetchData(pathVariables = [""], method = Method.GET, body, headers = {}) {
-        let response = await fetch(`/api/${pathVariables.join("/")}`, {
-            method,
-            body: body ? JSON.stringify(body) : undefined,
-            headers: {
-                "Content-Type": "application/json",
-                ...headers
-            }
-        });
-        if (!response.ok) {
-            return null;
-        }
-        try {
-            return await response.json();
-        } catch (error) {
-            return response;
-        }
-    }
-
     async function handleNewMeeting(meeting) {
-        const response = await fetchData([meetingsPath], Method.POST, meeting);
+    const response = await sendRequest([MEETINGS_PATH], METHOD.POST, meeting);
         if (response) {
             const nextMeetings = [...meetings, response];
             setMeetings(nextMeetings);
@@ -55,7 +27,7 @@ export default function MeetingsPage({username}) {
     }
 
     async function handleDeleteMeeting(meeting) {
-        const response = await fetchData([meetingsPath, meeting.id], Method.DELETE);
+        const response = await sendRequest([MEETINGS_PATH, meeting.id], METHOD.DELETE);
         if (response) {
             const nextMeetings = meetings.filter(m => m !== meeting);
             setMeetings(nextMeetings);
@@ -63,15 +35,15 @@ export default function MeetingsPage({username}) {
     }
 
     async function handleNewParticipant(meeting, participant) {
-        const response = await fetchData([meetingsPath, participantsPath, meeting.id], Method.PUT, participant);
+        const response = await sendRequest([MEETINGS_PATH, PARTICIPANTS_PATH, meeting.id], METHOD.PUT, participant);
         if (response) {
             setMeetings([...meetings]);
         }
     }
 
     async function handleDeleteParticipant(meeting, participant) {
-        const response = fetchData([meetingsPath, participantsPath, meeting.id, participant],
-            Method.PUT, participant);
+        const response = sendRequest([MEETINGS_PATH, PARTICIPANTS_PATH, meeting.id, participant],
+            METHOD.PUT, participant);
         if (response) {
             setMeetings([...meetings]);
         }

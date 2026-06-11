@@ -1,4 +1,4 @@
-package com.company.enroller.persistence;
+package com.company.enroller.error;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

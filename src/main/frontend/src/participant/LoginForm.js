@@ -1,8 +1,8 @@
 import {useState} from "react";
 import {toast} from "react-toastify";
-import GlobalToastContainer from "./meetings/GlobalToastContainer";
+import GlobalToastContainer from "../meetings/GlobalToastContainer";
 
-export default function LoginForm({onLogin}) {
+export default function LoginForm({onRegister, onLogin}) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const notify = () => toast.error("Login and/or password can't be empty", {});
@@ -20,7 +20,7 @@ export default function LoginForm({onLogin}) {
         {renderInput("text", email, (v) => setEmail(v))}
         {renderInput("password", password, (v) => setPassword(v))}
         {renderButton("Login", () => onLogin(email, password))}
-        {renderButton("Register", () => onLogin(email, password))}
+        {renderButton("Register", () => onRegister(email, password))}
         <GlobalToastContainer/>
     </div>;
 }

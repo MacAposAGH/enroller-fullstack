@@ -11,15 +11,18 @@ import org.springframework.security.web.authentication.www.BasicAuthenticationFi
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Optional;
 
 public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
-    private static final String HEADER_NAME = "Authorization";
-    private static final String TOKEN_PREFIX = "Bearer ";
+    static final String HEADER_NAME = "Authorization";
+    static final String TOKEN_PREFIX = "Bearer ";
     private final JWTVerifier verifier;
 
     public JWTAuthorizationFilter(AuthenticationManager authManager, String secret) throws UnsupportedEncodingException {
@@ -29,12 +32,21 @@ public class JWTAuthorizationFilter extends BasicAuthenticationFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
-        String header = req.getHeader(HEADER_NAME);
-        if (header != null && header.startsWith(TOKEN_PREFIX)) {
-            String token = header.substring(TOKEN_PREFIX.length());
+        Cookie[] cookies = req.getCookies();
+        if (cookies == null || cookies.length == 0) {
+            chain.doFilter(req, res);
+            return;
+        }
+
+        Optional<Cookie> cookie = Arrays.stream(cookies)
+                .filter(c -> c.getName().equals(HEADER_NAME))
+                .findFirst();
+        if (cookie.isPresent()) {
+            String token = cookie.get().getValue();
             Authentication authentication = extractUserFromToken(token);
             SecurityContextHolder.getContext().setAuthentication(authentication);
         }
+
         chain.doFilter(req, res);
     }
 

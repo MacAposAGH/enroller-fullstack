@@ -1,4 +1,4 @@
-package com.company.enroller.persistence;
+package com.company.enroller.service;
 
 import com.company.enroller.model.Participant;
 import org.hibernate.Session;

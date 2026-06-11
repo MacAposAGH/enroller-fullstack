@@ -1,7 +1,7 @@
 package com.company.enroller.security;
 
 import com.company.enroller.model.Participant;
-import com.company.enroller.persistence.ParticipantService;
+import com.company.enroller.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;

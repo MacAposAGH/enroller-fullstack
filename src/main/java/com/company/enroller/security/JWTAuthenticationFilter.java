@@ -4,6 +4,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.company.enroller.model.Participant;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -15,6 +16,7 @@ import org.springframework.security.web.authentication.AbstractAuthenticationPro
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import javax.servlet.FilterChain;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
@@ -23,6 +25,9 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Date;
 
+import static com.company.enroller.security.JWTAuthorizationFilter.*;
+
+
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
     private AuthenticationManager authenticationManager;
     private final String secret;
@@ -30,7 +35,7 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     private final int tokenExpiration;
 
     public JWTAuthenticationFilter(AuthenticationManager authenticationManager, String secret, String issuer, int tokenExpiration) {
-        super(new AntPathRequestMatcher("/tokens", HttpMethod.POST.name()));
+        super(new AntPathRequestMatcher("/login", HttpMethod.POST.name()));
         this.authenticationManager = authenticationManager;
         this.secret = secret;
         this.issuer = issuer;
@@ -61,6 +66,14 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
                 .withExpiresAt(Date.from(now.plusSeconds(tokenExpiration).atZone(ZoneId.systemDefault()).toInstant()))
                 .withClaim("role", "participant")
                 .sign(Algorithm.HMAC256(secret));
-        res.getWriter().write(String.format("{\"token\": \"%s\"}", token));
+        res.getWriter().write(String.format("{\"login\": \"%s\"}", login));
+
+        Cookie cookie = new Cookie(HEADER_NAME, token);
+        cookie.setHttpOnly(true);
+        cookie.setSecure(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(tokenExpiration);
+
+        res.addCookie(cookie);
     }
 }
