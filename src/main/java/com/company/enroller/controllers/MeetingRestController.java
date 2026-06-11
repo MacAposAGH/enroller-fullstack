@@ -42,7 +42,8 @@ public class MeetingRestController {
         if (meetingService.exists(meeting)) {
             return errorHandler.entityAlreadyExist();
         }
-        return new ResponseEntity<>(meetingService.addMeeting(meeting), HttpStatus.CREATED);
+        Meeting meeting1 = meetingService.addMeeting(meeting);
+        return new ResponseEntity<>(meeting1, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -56,7 +57,6 @@ public class MeetingRestController {
         if (meetingService.exists(meeting)) {
             errorHandler.entityAlreadyExist(message);
         }
-
         meetingService.updateMeeting(id, meeting);
         return new ResponseEntity<>(HttpStatus.OK);
     }
