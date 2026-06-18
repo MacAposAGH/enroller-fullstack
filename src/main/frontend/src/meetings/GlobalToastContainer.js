@@ -1,7 +1,11 @@
 import React from 'react';
-import {Slide, ToastContainer} from "react-toastify";
+import {Slide, toast, ToastContainer} from "react-toastify";
 
-export  default function GlobalToastContainer() {
+  function notifyError(content) {
+    toast.error(content, {});
+}
+
+  function GlobalToastContainer() {
     return (
         <ToastContainer position="top-center"
                         autoClose={2000}
@@ -16,4 +20,6 @@ export  default function GlobalToastContainer() {
                         transition={Slide}/>
     );
 }
+
+export  {notifyError, GlobalToastContainer}
 

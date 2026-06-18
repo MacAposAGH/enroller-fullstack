@@ -12,7 +12,7 @@ export default function MeetingsList({meetings, username, onDelete, onNewPartici
     };
 
     const isParticipant = (meeting) => {
-        return meeting.participants.find(p => p.login === username);
+        return meeting.participants ?? meeting.participants.find(p => p.login === username);
     };
 
     return (
@@ -26,25 +26,28 @@ export default function MeetingsList({meetings, username, onDelete, onNewPartici
             </tr>
             </thead>
             <tbody>
-            {
-                meetings.map((meeting, index) => <tr key={index}>
+            {meetings.map((meeting, index) =>
+                <tr key={index}>
                     <td>{meeting.title}</td>
                     <td>{meeting.description}</td>
-                    <td>
-                        <ul>
-                            {meeting.participants.map((participant, index) =>
-                                <li key={index}>{participant.login}</li>)}
-                        </ul>
-                    </td>
+                    {meeting.participants &&
+                        <>
+                            <td>
+                                <ul>
+                                    {meeting.participants.map((participant, index) =>
+                                        <li key={index}>{participant.login}</li>)}
+                                </ul>
+                            </td>
+
+                        </>}
                     <td>
                         {!isParticipant(meeting) &&
                             <button onClick={() => onSignIn(meeting)}>Sign in</button>}
                         {isParticipant(meeting) &&
                             <button onClick={() => onSignOut(meeting)}>Sign out</button>}
-                        {meeting.participants.length === 0 &&
+                        {meeting.participants && meeting.participants.length === 0 &&
                             <button onClick={() => onDelete(meeting)}>Delete</button>}
                     </td>
-
                 </tr>)
             }
             </tbody>

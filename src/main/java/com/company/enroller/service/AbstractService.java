@@ -5,7 +5,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 
 import java.util.Collection;
-import java.util.List;
 import java.util.function.BiConsumer;
 
 public abstract class AbstractService<T> {
@@ -25,8 +24,7 @@ public abstract class AbstractService<T> {
 
     protected Collection<T> getAll(Class<T> type) {
         String hql = "FROM %s".formatted(type.getSimpleName());
-        List<T> list = connector.getSession().createQuery(hql, type).list();
-        return list;
+        return connector.getSession().createQuery(hql, type).list();
     }
 
     protected T findById(Class<T> type, String id) {

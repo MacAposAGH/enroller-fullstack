@@ -4,12 +4,13 @@ import MeetingsList from "./MeetingsList";
 import {MEETINGS_PATH, METHOD, PARTICIPANTS_PATH, sendRequest} from "../Util";
 
 export default function MeetingsPage({username}) {
-    const [meetings, setMeetings] = useState([]);
+    const [meetings, setMeetings] = useState(null);
     const [addingNewMeeting, setAddingNewMeeting] = useState(false);
+    const [loaded, setLoaded] = useState(false);
 
     useEffect(() => {
         (async () => {
-            // await (() => new Promise(r => setTimeout(r, 2000)))();
+            await (() => new Promise(r => setTimeout(r, 2000)))();
             const response = await sendRequest([MEETINGS_PATH]);
             if (response) {
                 setMeetings(response);
@@ -18,7 +19,7 @@ export default function MeetingsPage({username}) {
     }, []);
 
     async function handleNewMeeting(meeting) {
-    const response = await sendRequest([MEETINGS_PATH], METHOD.POST, meeting);
+        const response = await sendRequest([MEETINGS_PATH], METHOD.POST, meeting);
         if (response) {
             const nextMeetings = [...meetings, response];
             setMeetings(nextMeetings);
@@ -51,17 +52,18 @@ export default function MeetingsPage({username}) {
 
     return (
         <div>
-            <h2>Zajęcia ({meetings.length})</h2>
+            <h2>Zajęcia ({meetings ? meetings.length : 0})</h2>
             {
                 addingNewMeeting
                     ? <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)}/>
                     : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
             }
-            {meetings.length > 0 ?
-                <MeetingsList meetings={meetings} username={username}
-                              onDelete={handleDeleteMeeting}
-                              onNewParticipant={handleNewParticipant}
-                              onDeleteParticipant={handleDeleteParticipant}/> :
+            {meetings ? meetings.length > 0 ?
+                    <MeetingsList meetings={meetings} username={username}
+                                  onDelete={handleDeleteMeeting}
+                                  onNewParticipant={handleNewParticipant}
+                                  onDeleteParticipant={handleDeleteParticipant}/> :
+                    <div>Nie masz ustalonych spotkań</div> :
                 <div className="lds-ripple">
                     <div></div>
                     <div></div>

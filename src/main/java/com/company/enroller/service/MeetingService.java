@@ -2,7 +2,6 @@ package com.company.enroller.service;
 
 import com.company.enroller.model.Meeting;
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.hibernate.query.Query;
 import org.springframework.stereotype.Component;
 
@@ -32,11 +31,7 @@ public class MeetingService extends AbstractService<Meeting> {
     }
 
     public Meeting addMeeting(Meeting meeting) {
-        Session session = connector.getSession();
-        Transaction transaction = session.beginTransaction();
-        session.persist(meeting);
-        transaction.commit();
-        return meeting;
+        return transaction(meeting, Session::save);
     }
 
     public void updateMeeting(Long id, Meeting meeting) {

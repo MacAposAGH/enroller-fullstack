@@ -13,8 +13,8 @@ import java.util.Set;
 public class Meeting {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long id;
 
     @Column
     private String title;
@@ -32,7 +32,7 @@ public class Meeting {
             inverseJoinColumns = {@JoinColumn(name = "participant_login")})
     Set<Participant> participants = new HashSet<>();
 
-    public Long getId() {
+    public long getId() {
         return id;
     }
 
@@ -48,7 +48,7 @@ public class Meeting {
         return date;
     }
 
-    public void setId(Long id) {
+    public void setId(long id) {
         this.id = id;
     }
 
