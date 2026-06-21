@@ -13,9 +13,9 @@ import {Slide, toast, ToastContainer} from "react-toastify";
                         newestOnTop={false}
                         closeOnClick={false}
                         rtl={false}
-                        pauseOnFocusLoss
+                        // pauseOnFocusLoss
                         draggable
-                        pauseOnHover
+                        // pauseOnHover
                         theme="dark"
                         transition={Slide}/>
     );

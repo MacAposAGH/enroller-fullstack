@@ -37,7 +37,8 @@ function App() {
     async function login(login, password) {
         const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login, password});
         if (response.ok) {
-            const login = await response.json();
+            const json = await response.json();
+            const login = json.login;
             localStorage.setItem(item, login);
             setLoggedIn(login);
             return;
@@ -56,7 +57,6 @@ function App() {
             <LoginForm onLogin={login} onRegister={register}/>}
         <GlobalToastContainer/>
     </div>;
-
 }
 
 export default App;

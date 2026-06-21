@@ -1,5 +1,5 @@
 import {useState} from "react";
-import {notifyError, GlobalToastContainer} from "../Util";
+import {notifyError} from "../Util";
 
 export default function LoginForm({onLogin, onRegister}) {
     const [login, setLogin] = useState("");
@@ -25,6 +25,5 @@ export default function LoginForm({onLogin, onRegister}) {
                 setPassword("");
             }
         })}
-        <GlobalToastContainer/>
     </div>;
 }
