@@ -19,9 +19,14 @@ function App() {
 
     useEffect(() => {
         const login = localStorage.getItem(item);
-        if (login) {
-            setLoggedIn(login);
-        }
+        (async () => {
+            if (login) {
+                const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
+                if(response.ok){
+                    setLoggedIn(login);
+                }
+            }
+        })();
     }, []);
 
     async function register(login, password) {
@@ -47,7 +52,7 @@ function App() {
     }
 
     function logout() {
-        localStorage.removeItem(item);
+        // localStorage.removeItem(item);
         setLoggedIn("");
     }
 
