@@ -23,8 +23,7 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         String jwt = jwtService.extractJwtFromCookies(req);
         if (jwt != null) {
-            Authentication authentication = jwtService.extractUserFromJwt(jwt);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
+            jwtService.extractUserFromJwt(jwt);
         }
         chain.doFilter(req, res);
     }

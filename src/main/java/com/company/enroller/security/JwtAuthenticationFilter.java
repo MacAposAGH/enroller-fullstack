@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -40,15 +41,17 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         }
         String password = participant.getPassword();
         Authentication authentication;
-        String jwt;
-        // password less authentication
-        if (password == null && (jwt = jwtService.extractJwtFromCookies(req)) != null) {
-            authentication = jwtService.extractUserFromJwt(jwt);
-        } else {
+        if (password != null) {
             authentication = new UsernamePasswordAuthenticationToken(participant.getLogin(), password,
                     new ArrayList<>());
+            return authenticationManager.authenticate(authentication);
         }
-        return authenticationManager.authenticate(authentication);
+        // password-less authentication
+        String jwt = jwtService.extractJwtFromCookies(req);
+        if (jwt != null) {
+            jwtService.extractUserFromJwt(jwt);
+        }
+        return null;
     }
 
     @Override

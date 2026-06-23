@@ -3,16 +3,18 @@ package com.company.enroller.security;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.JWTVerifier;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 
@@ -22,6 +24,9 @@ public class JwtService {
     private final String HEADER_NAME = "Authorization";
     private final String secret;
     private final JWTVerifier jwtVerifier;
+
+    @Autowired
+    private ParticipantProvider participantProvider;
 
     @Value("${security.issuer}")
     private String issuer;
@@ -46,10 +51,20 @@ public class JwtService {
                 .orElse(null);
     }
 
-    public Authentication extractUserFromJwt(String jwt) {
+    public void extractUserFromJwt(String jwt) {
+        String username = jwtVerifier.verify(jwt).getSubject();
+        if (username == null) {
+            return;
+        }
+        UserDetails userDetails = participantProvider.loadUserByUsername(username);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+    }
+
+    public UserDetails extractUsernameFromJwt(String jwt) {
         String username = jwtVerifier.verify(jwt).getSubject();
         if (username != null) {
-            return new UsernamePasswordAuthenticationToken(username, null, new ArrayList<>());
+            return participantProvider.loadUserByUsername(username);
         }
         return null;
     }

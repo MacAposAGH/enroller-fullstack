@@ -6,7 +6,7 @@ import LoginForm from "./participant/LoginForm";
 import {
     CREDENTIALS,
     GlobalToastContainer,
-    LOGIN_PATH,
+    LOGIN_PATH, LOGOUT_PATH,
     METHOD,
     notifyError,
     PARTICIPANTS_PATH,
@@ -51,9 +51,12 @@ function App() {
         notifyError("User not found");
     }
 
-    function logout() {
-        // localStorage.removeItem(item);
-        setLoggedIn("");
+   async function logout() {
+        const response = await sendRequest2([LOGOUT_PATH], METHOD.POST);
+        if(response.ok){
+            localStorage.removeItem(item);
+            setLoggedIn("");
+        }
     }
 
     return <div>

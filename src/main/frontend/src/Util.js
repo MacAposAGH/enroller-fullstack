@@ -11,6 +11,7 @@ const CREDENTIALS = {omit: "omit", include: "include"};
 const MEETINGS_PATH = "meetings";
 const PARTICIPANTS_PATH = "participants";
 const LOGIN_PATH = "login";
+const LOGOUT_PATH = "logout";
 
 export async function sendRequest2(pathVariables = [""], method = METHOD.GET, body,
                             credentials = CREDENTIALS.include, headers = {}) {
@@ -63,4 +64,4 @@ export function GlobalToastContainer() {
     );
 }
 
-export {METHOD, MEETINGS_PATH, PARTICIPANTS_PATH, LOGIN_PATH, CREDENTIALS};
+export {METHOD, MEETINGS_PATH, PARTICIPANTS_PATH, LOGIN_PATH, LOGOUT_PATH, CREDENTIALS};
