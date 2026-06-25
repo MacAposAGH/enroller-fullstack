@@ -20,13 +20,13 @@ function App() {
     useEffect(() => {
         const login = localStorage.getItem(item);
         (async () => {
-            if (login) {
-                const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
-                console.log(response);
-                if(response.ok){
-                    setLoggedIn(login);
-                }
-            }
+            // if (login) {
+            //     const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
+            //     console.log(response);
+            //     if(response.ok){
+            //         setLoggedIn(login);
+            //     }
+            // }
         })();
     }, []);
 
