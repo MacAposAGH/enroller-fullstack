@@ -39,18 +39,18 @@ public class ParticipantRestController {
         return new ResponseEntity<>(participant, HttpStatus.OK);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST)
-    public ResponseEntity<?> login(@RequestBody Participant participant, HttpServletResponse response) {
-        if (participantService.findByLogin(participant.getLogin()) != null) {
-            return errorHandler.entityDoesntExist();
-        }
+//    @RequestMapping(value = "/login", method = RequestMethod.POST)
+//    public ResponseEntity<?> login(@RequestBody Participant participant, HttpServletResponse response) {
+//        if (participantService.findByLogin(participant.getLogin()) != null) {
+//            return errorHandler.entityDoesntExist();
+//        }
+//
+//
+//
+//        return new ResponseEntity<>(participant, HttpStatus.OK);
+//    }
 
-
-
-        return new ResponseEntity<>(participant, HttpStatus.OK);
-    }
-
-    @RequestMapping(value = "", method = RequestMethod.POST)
+    @RequestMapping(value = "/new", method = RequestMethod.POST)
     public ResponseEntity<?> registerParticipant(@RequestBody Participant participant) {
         if (participantService.findByLogin(participant.getLogin()) != null) {
             return errorHandler.entityAlreadyExist();

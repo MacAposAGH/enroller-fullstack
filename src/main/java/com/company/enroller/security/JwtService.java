@@ -61,13 +61,6 @@ public class JwtService {
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 
-    public UserDetails extractUsernameFromJwt(String jwt) {
-        String username = jwtVerifier.verify(jwt).getSubject();
-        if (username != null) {
-            return participantProvider.loadUserByUsername(username);
-        }
-        return null;
-    }
 
     private String createJwt(String login) {
         LocalDateTime now = LocalDateTime.now();
