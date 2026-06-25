@@ -38,21 +38,19 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         } catch (IOException e) {
             throw new BadCredentialsException("Invalid login request.", e);
         }
+
         String password = participant.getPassword();
-        Authentication authentication;
-        // password less authentication
         if (password != null) {
-             authentication = new UsernamePasswordAuthenticationToken(participant.getLogin(),
-                    participant.getPassword(), new ArrayList<>());
+            Authentication authentication = new UsernamePasswordAuthenticationToken(participant.getLogin(), password, new ArrayList<>());
             return authenticationManager.authenticate(authentication);
         }
-
         String jwt = jwtService.extractJwtFromCookies(req);
-        if(jwt!=null){
-            jwtService.extractUserFromJwt(jwt);
+        if (jwt == null) {
+            throw new BadCredentialsException("Invalid credentials");
         }
-
         return null;
+//        jwtService.extractUserFromJwt(jwt);
+//        return SecurityContextHolder.getContext().getAuthentication();
     }
 
     @Override

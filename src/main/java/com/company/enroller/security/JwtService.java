@@ -57,7 +57,8 @@ public class JwtService {
             return;
         }
         UserDetails userDetails = participantProvider.loadUserByUsername(username);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(), null);
+        Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
+                null, null);
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

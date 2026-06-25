@@ -20,18 +20,18 @@ function App() {
     useEffect(() => {
         const login = localStorage.getItem(item);
         (async () => {
-            // if (login) {
-            //     const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
-            //     console.log(response);
-            //     if(response.ok){
-            //         setLoggedIn(login);
-            //     }
-            // }
+            if (login) {
+                const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
+                console.log(response);
+                if(response.ok){
+                    setLoggedIn(login);
+                }
+            }
         })();
     }, []);
 
     async function register(login, password) {
-        const response = await sendRequest2([PARTICIPANTS_PATH, "new"], METHOD.POST, {login, password},
+        const response = await sendRequest2([PARTICIPANTS_PATH], METHOD.POST, {login, password},
             CREDENTIALS.include);
         console.log(response);
         if (response.ok) {

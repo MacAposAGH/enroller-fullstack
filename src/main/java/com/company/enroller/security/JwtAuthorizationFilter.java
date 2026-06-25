@@ -19,6 +19,11 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         this.jwtService = jwtService;
     }
 
+@Override
+protected boolean shouldNotFilter(HttpServletRequest req){
+    return req.getServletPath().equals("/participants") && req.getMethod().equals("POST");
+}
+
     @Override
     protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain chain) throws IOException, ServletException {
         String jwt = jwtService.extractJwtFromCookies(req);

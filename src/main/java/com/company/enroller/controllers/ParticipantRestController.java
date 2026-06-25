@@ -50,7 +50,7 @@ public class ParticipantRestController {
 //        return new ResponseEntity<>(participant, HttpStatus.OK);
 //    }
 
-    @RequestMapping(value = "/new", method = RequestMethod.POST)
+    @RequestMapping(value = "", method = RequestMethod.POST)
     public ResponseEntity<?> registerParticipant(@RequestBody Participant participant) {
         if (participantService.findByLogin(participant.getLogin()) != null) {
             return errorHandler.entityAlreadyExist();
