@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -59,6 +60,7 @@ public class JwtService {
         UserDetails userDetails = participantProvider.loadUserByUsername(username);
         Authentication authentication = new UsernamePasswordAuthenticationToken(userDetails.getUsername(),
                 null, null);
+        SecurityContext context = SecurityContextHolder.getContext();
         SecurityContextHolder.getContext().setAuthentication(authentication);
     }
 

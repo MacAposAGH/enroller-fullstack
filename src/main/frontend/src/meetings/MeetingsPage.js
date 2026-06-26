@@ -11,10 +11,10 @@ export default function MeetingsPage({username}) {
     useEffect(() => {
         (async () => {
             await (() => new Promise(r => setTimeout(r, 2000)))();
-            const response = await sendRequest([MEETINGS_PATH]);
-            if (response) {
-                setMeetings(response);
-            }
+            // const response = await sendRequest([MEETINGS_PATH]);
+            // if (response) {
+            //     setMeetings(response);
+            // }
         })();
     }, []);
 

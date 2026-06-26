@@ -8,6 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.AbstractAuthenticationProcessingFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
@@ -39,6 +40,7 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
             throw new BadCredentialsException("Invalid login request.", e);
         }
 
+        Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
         String password = participant.getPassword();
         if (password != null) {
             Authentication authentication = new UsernamePasswordAuthenticationToken(participant.getLogin(), password, new ArrayList<>());
@@ -48,10 +50,19 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         if (jwt == null) {
             throw new BadCredentialsException("Invalid credentials");
         }
+        jwtService.extractUserFromJwt(jwt);
         return null;
-//        jwtService.extractUserFromJwt(jwt);
-//        return SecurityContextHolder.getContext().getAuthentication();
     }
+
+//    @Override
+//    protected boolean requiresAuthentication(HttpServletRequest req, HttpServletResponse res) {
+//        String path = req.getServletPath();
+//        String jwt = jwtService.extractJwtFromCookies(req);
+//        if (jwt == null) {
+//            return super.requiresAuthentication(req, res);
+//        }
+//        return true;
+//    }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException {
