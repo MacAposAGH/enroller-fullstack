@@ -40,7 +40,6 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
             throw new BadCredentialsException("Invalid login request.", e);
         }
 
-        Authentication authentication1 = SecurityContextHolder.getContext().getAuthentication();
         String password = participant.getPassword();
         if (password != null) {
             Authentication authentication = new UsernamePasswordAuthenticationToken(participant.getLogin(), password, new ArrayList<>());
@@ -48,21 +47,11 @@ public class JwtAuthenticationFilter extends AbstractAuthenticationProcessingFil
         }
         String jwt = jwtService.extractJwtFromCookies(req);
         if (jwt == null) {
-            throw new BadCredentialsException("Invalid credentials");
+            throw new BadCredentialsException("Invalid token");
         }
         jwtService.extractUserFromJwt(jwt);
         return null;
     }
-
-//    @Override
-//    protected boolean requiresAuthentication(HttpServletRequest req, HttpServletResponse res) {
-//        String path = req.getServletPath();
-//        String jwt = jwtService.extractJwtFromCookies(req);
-//        if (jwt == null) {
-//            return super.requiresAuthentication(req, res);
-//        }
-//        return true;
-//    }
 
     @Override
     protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain, Authentication auth) throws IOException {
