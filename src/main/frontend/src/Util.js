@@ -13,8 +13,10 @@ const PARTICIPANTS_PATH = "participants";
 const LOGIN_PATH = "login";
 const LOGOUT_PATH = "logout";
 
-export async function sendRequest2(pathVariables = [""], method = METHOD.GET, body,
-                            credentials = CREDENTIALS.include, headers = {}) {
+export async function sendRequest(pathVariables = [""], method = METHOD.GET, body,
+                                  credentials = CREDENTIALS.include, headers = {}) {
+    const s = `http://localhost:8080/${pathVariables.join("/")}`;
+    console.log(s);
     return await fetch(`http://localhost:8080/${pathVariables.join("/")}`, {
         method,
         credentials,
@@ -25,24 +27,6 @@ export async function sendRequest2(pathVariables = [""], method = METHOD.GET, bo
         }
     });
 }
-
-export async function sendRequest(pathVariables = [""], method = METHOD.GET, body,
-                           credentials = CREDENTIALS.include, headers = {}) {
-    const response = await fetch(`http://localhost:8080/${pathVariables.join("/")}`, {
-        method,
-        credentials,
-        body: body ? JSON.stringify(body) : undefined,
-        headers: {
-            "Content-Type": "application/json",
-            ...headers
-        }
-    });
-    if (response.ok) {
-        return await response.json();
-    }
-    return response;
-}
-
 
 export function notifyError(content) {
     toast.error(content, {});

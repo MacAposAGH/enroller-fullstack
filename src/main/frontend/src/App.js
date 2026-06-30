@@ -10,7 +10,7 @@ import {
     METHOD,
     notifyError,
     PARTICIPANTS_PATH,
-    sendRequest2,
+    sendRequest,
 } from "./Util";
 
 function App() {
@@ -21,8 +21,7 @@ function App() {
         const login = localStorage.getItem(item);
         (async () => {
             if (login) {
-                const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login});
-                console.log(response);
+                const response = await sendRequest([LOGIN_PATH], METHOD.POST, {login});
                 if(response.ok){
                     setLoggedIn(login);
                 }
@@ -31,9 +30,8 @@ function App() {
     }, []);
 
     async function register(login, password) {
-        const response = await sendRequest2([PARTICIPANTS_PATH], METHOD.POST, {login, password},
+        const response = await sendRequest([PARTICIPANTS_PATH], METHOD.POST, {login, password},
             CREDENTIALS.include);
-        console.log(response);
         if (response.ok) {
             return true;
         }
@@ -42,8 +40,7 @@ function App() {
     }
 
     async function login(login, password) {
-        const response = await sendRequest2([LOGIN_PATH], METHOD.POST, {login, password});
-        console.log(response);
+        const response = await sendRequest([LOGIN_PATH], METHOD.POST, {login, password});
         if (response.ok) {
             const json = await response.json();
             const login = json.login;
@@ -55,7 +52,7 @@ function App() {
     }
 
    async function logout() {
-        const response = await sendRequest2([LOGOUT_PATH], METHOD.POST);
+        const response = await sendRequest([LOGOUT_PATH], METHOD.POST);
         if(response.ok){
             localStorage.removeItem(item);
             setLoggedIn("");

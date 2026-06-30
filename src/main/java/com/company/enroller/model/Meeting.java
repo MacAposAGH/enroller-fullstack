@@ -25,7 +25,6 @@ public class Meeting {
     @Column
     private String date;
 
-    @JsonIgnore
     @ManyToMany(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(name = "meeting_participant",
             joinColumns = {@JoinColumn(name = "meeting_id")},

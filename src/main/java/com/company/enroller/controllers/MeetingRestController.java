@@ -1,8 +1,8 @@
 package com.company.enroller.controllers;
 
+import com.company.enroller.error.ErrorHandler;
 import com.company.enroller.model.Meeting;
 import com.company.enroller.model.Participant;
-import com.company.enroller.error.ErrorHandler;
 import com.company.enroller.service.MeetingService;
 import com.company.enroller.service.ParticipantService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,8 +42,8 @@ public class MeetingRestController {
         if (meetingService.exists(meeting)) {
             return errorHandler.entityAlreadyExist();
         }
-        Meeting meeting1 = meetingService.addMeeting(meeting);
-        return new ResponseEntity<>(meeting1, HttpStatus.CREATED);
+        Meeting newMeeting = meetingService.addMeeting(meeting);
+        return new ResponseEntity<>(newMeeting, HttpStatus.CREATED);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
@@ -68,7 +68,7 @@ public class MeetingRestController {
             return errorHandler.entityDoesntExist();
         }
         meetingService.deleteMeeting(meeting);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<Object>(meeting, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}/participants", method = RequestMethod.GET)
@@ -101,11 +101,11 @@ public class MeetingRestController {
         if (meeting == null) {
             return errorHandler.entityDoesntExist("Meeting");
         }
-
-        if (!meeting.getParticipants().contains(participant)) {
+        Participant existingParticipant = participantService.findByLogin(participant.getLogin());
+        if (existingParticipant == null || !meeting.getParticipants().contains(existingParticipant)) {
             return errorHandler.entityDoesntExist("Participant");
         }
-        meeting.getParticipants().remove(participant);
+        meeting.getParticipants().remove(existingParticipant);
         meetingService.updateMeeting(id, meeting);
         return new ResponseEntity<>(meeting, HttpStatus.OK);
     }
