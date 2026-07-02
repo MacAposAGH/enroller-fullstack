@@ -34,9 +34,8 @@ public class MeetingService extends AbstractService<Meeting> {
         return transaction(meeting, Session::save);
     }
 
-    public void updateMeeting(Long id, Meeting meeting) {
-        meeting.setId(id);
-        transaction(meeting, Session::update);
+    public void updateMeeting(Meeting meeting) {
+        transaction(meeting, Session::merge);
     }
 
     public void deleteMeeting(Meeting meeting) {

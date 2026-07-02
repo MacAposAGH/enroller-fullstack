@@ -47,8 +47,7 @@ public class MeetingRestController {
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.PUT)
-    public ResponseEntity<?> updateMeeting(@PathVariable Long id,
-                                           @RequestBody Meeting meeting) {
+    public ResponseEntity<?> updateMeeting(@PathVariable Long id, @RequestBody Meeting meeting) {
         Meeting existingMeeting = meetingService.findById(id);
         String message = "Meeting to update";
         if (existingMeeting == null) {
@@ -57,8 +56,8 @@ public class MeetingRestController {
         if (meetingService.exists(meeting)) {
             errorHandler.entityAlreadyExist(message);
         }
-        meetingService.updateMeeting(id, meeting);
-        return new ResponseEntity<>(HttpStatus.OK);
+        meetingService.updateMeeting(meeting);
+        return new ResponseEntity<>(meeting, HttpStatus.OK);
     }
 
     @RequestMapping(value = "/{id}", method = RequestMethod.DELETE)
@@ -91,7 +90,7 @@ public class MeetingRestController {
             return errorHandler.entityDoesntExist("Participant");
         }
         meeting.getParticipants().add(existingParticipant);
-        meetingService.updateMeeting(id, meeting);
+        meetingService.updateMeeting(meeting);
         return new ResponseEntity<>(meeting, HttpStatus.CREATED);
     }
 
@@ -106,8 +105,7 @@ public class MeetingRestController {
             return errorHandler.entityDoesntExist("Participant");
         }
         meeting.getParticipants().remove(existingParticipant);
-        meetingService.updateMeeting(id, meeting);
+        meetingService.updateMeeting(meeting);
         return new ResponseEntity<>(meeting, HttpStatus.OK);
     }
-
 }

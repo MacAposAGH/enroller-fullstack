@@ -1,15 +1,20 @@
 import {useEffect, useState} from "react";
 import NewMeetingForm from "./NewMeetingForm";
+import {getTodayDate, MEETINGS_PATH, METHOD, PARTICIPANTS_PATH, scrollToTop, sendRequest} from "../Util";
 import MeetingsList from "./MeetingsList";
-import {MEETINGS_PATH, METHOD, PARTICIPANTS_PATH, sendRequest} from "../Util";
 
 export default function MeetingsPage({username}) {
+    const emptyMeeting = {title: "", description: "", date: getTodayDate()};
+    const [meeting, setMeeting] = useState(emptyMeeting);
     const [meetings, setMeetings] = useState([]);
-    const [addingNewMeeting, setAddingNewMeeting] = useState(false);
+    const [showForm, setShowForm] = useState(false);
+    const [shouldUpdate, setShouldUpdate] = useState(false);
+    const [spinner, setSpinner] = useState(true);
 
     useEffect(() => {
         (async () => {
             await (() => new Promise(r => setTimeout(r, 1000)))();
+            setSpinner(false);
             const response = await sendRequest([MEETINGS_PATH]);
             if (response.ok) {
                 setMeetings(await response.json());
@@ -17,12 +22,37 @@ export default function MeetingsPage({username}) {
         })();
     }, []);
 
-    async function handleNewMeeting(meeting) {
-        const response = await sendRequest([MEETINGS_PATH], METHOD.POST, meeting);
-        if (response.ok) {
-            setMeetings([...meetings, await response.json()]);
-            setAddingNewMeeting(false);
+    async function handleCreate() {
+        const method = shouldUpdate ? METHOD.PUT : METHOD.POST;
+        const pathVariables = [MEETINGS_PATH, ...(shouldUpdate ? [meeting.id] : [])];
+        const response = await sendRequest(pathVariables, method, meeting);
+        if (!response.ok) {
+            return;
         }
+        if (shouldUpdate) {
+            setMeetings(prevState => prevState.map(m => m.id === meeting.id ? meeting : m));
+        } else {
+            const newMeetings = await response.json();
+            setMeetings(prevState => [...prevState, newMeetings]);
+        }
+        setShouldUpdate(false);
+        setShowForm(false);
+    }
+
+    function handleUpdate(meeting) {
+        setShouldUpdate(true);
+        setShowForm(true);
+        setMeeting(meeting);
+    }
+
+    function handleSet(e) {
+        const {name, value} = e.target;
+        setMeeting((prevState) => {
+            return {
+                ...prevState,
+                [name]: value,
+            };
+        });
     }
 
     async function handleDeleteMeeting(meeting) {
@@ -33,7 +63,7 @@ export default function MeetingsPage({username}) {
         }
     }
 
-    async function handleNewParticipant(meeting, participant) {
+    async function handleAddParticipant(meeting, participant) {
         const response = await sendRequest([MEETINGS_PATH, meeting.id, PARTICIPANTS_PATH],
             METHOD.POST, participant);
         if (response.ok) {
@@ -51,24 +81,31 @@ export default function MeetingsPage({username}) {
         }
     }
 
-    return (
-        <div>
-            <h2>Zajęcia ({meetings ? meetings.length : 0})</h2>
-            {
-                addingNewMeeting
-                    ? <NewMeetingForm onSubmit={(meeting) => handleNewMeeting(meeting)}/>
-                    : <button onClick={() => setAddingNewMeeting(true)}>Dodaj nowe spotkanie</button>
-            }
-            {meetings ? meetings.length > 0 ?
-                    <MeetingsList meetings={meetings} login={username}
-                                  onDelete={handleDeleteMeeting}
-                                  onNewParticipant={handleNewParticipant}
-                                  onDeleteParticipant={handleDeleteParticipant}/> :
-                    <div>Nie masz ustalonych spotkań</div> :
-                <div className="lds-ripple">
-                    <div></div>
-                    <div></div>
-                </div>}
-        </div>
-    );
+    return <div>
+        {spinner ?
+            <div className="lds-ripple">
+                <div></div>
+                <div></div>
+            </div> :
+            <>
+                {showForm ?
+                    <NewMeetingForm meeting={meeting} onSet={handleSet} onCreate={handleCreate}/> :
+                    <button onClick={() => {
+                        setShowForm(true);
+                        setMeeting(emptyMeeting);
+                        scrollToTop()
+                    }}>Dodaj nowe spotkanie</button>
+                }
+                {meetings.length > 0 ?
+                    <>
+                        <h2>Zajęcia ({meetings.length})</h2>
+                        <MeetingsList meetings={meetings} login={username}
+                                      onUpdate={handleUpdate}
+                                      onDelete={handleDeleteMeeting}
+                                      onAddParticipant={handleAddParticipant}
+                                      onDeleteParticipant={handleDeleteParticipant}/>
+                    </> :
+                    <div>Nie masz zaplanowanych spotkań</div>}
+            </>}
+    </div>;
 }

@@ -13,10 +13,9 @@ const PARTICIPANTS_PATH = "participants";
 const LOGIN_PATH = "login";
 const LOGOUT_PATH = "logout";
 
+
 export async function sendRequest(pathVariables = [""], method = METHOD.GET, body,
                                   credentials = CREDENTIALS.include, headers = {}) {
-    const s = `http://localhost:8080/${pathVariables.join("/")}`;
-    console.log(s);
     return await fetch(`http://localhost:8080/${pathVariables.join("/")}`, {
         method,
         credentials,
@@ -27,6 +26,18 @@ export async function sendRequest(pathVariables = [""], method = METHOD.GET, bod
         }
     });
 }
+
+export function getTodayDate(){
+    return new Date().toISOString().split('T')[0];
+}
+
+
+export function scrollToTop() {
+    window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+    });
+};
 
 export function notifyError(content) {
     toast.error(content, {});
